@@ -101,7 +101,8 @@ function setData(text){
     const stem=lines.slice(0,gi), nb=stem.join('\n').split(BLK).length-1;
     const al=(o['解答']||'').replace(/\r\n?/g,'\n').split('\n');
     const num=(o['番号解答']||al[0]||'').trim(), eng=al.slice(1).join(' ');
-    ALL.push({no,unit:(o['単元']||'').trim()||'その他',stem,items,note,nb,num,eng,ans:o['解答']||'',ex:o['解説']||''});
+    const alts=(o['別解']||'').split('|').map(x=>x.trim()).filter(Boolean);   // 別解の番号解答(複数は | 区切り)
+    ALL.push({no,unit:(o['単元']||'').trim()||'その他',stem,items,note,nb,num,eng,alts,ans:o['解答']||'',ex:o['解説']||''});
   });
   LSK=title=='中級整序問題'?'seijo_v1':'seijo_v1_'+title;   // アプリ名ごとに記録を分ける
   st=loadSt();
@@ -118,10 +119,11 @@ function init(){
 }
 
 /* 判定(純粋関数) */
+const sentence=(q,seq)=>{let k=0;const ix=[...seq].map(c=>CIRC.indexOf(c));return q.stem.filter(l=>!isJp(l)).join(' ').replace(/\(     \)/g,()=>q.items[ix[k++]]||'')};
 function check(q,picks){
   const seq=picks.map(i=>CIRC[i]).join('');
   let k=0;const text=q.stem.filter(l=>!isJp(l)).join(' ').replace(/\(     \)/g,()=>q.items[picks[k++]]||'');
-  return{seq,ok:seq===q.num||flat(text)===flat(q.eng)};
+  return{seq,ok:seq===q.num||q.alts.includes(seq)||flat(text)===flat(q.eng)};
 }
 
 /* ---------- ホーム ---------- */
@@ -199,7 +201,7 @@ function feedback(){
   const q=Q.list[Q.i], ok=Q.res, last=Q.i==Q.list.length-1;
   const lbl=()=>st.stock.includes(q.no)?'★ ストック済み(タップで外す)':'☆ 自信がない:ストックに追加';
   $('#fb').innerHTML=`<div class="fb${ok?'':' bad'}"><h3>${ok?'◯ 正解':'✕ 不正解'}</h3>
-    <div class="ans">${esc(q.ans)}</div><p class="ex">${esc(q.ex)}</p>${ok?'':'<p class="sub">この問題をストックしました。</p>'}</div>
+    <div class="ans">${esc(q.ans)}</div>${q.alts.length?`<p class="sub">別解も正解です:${q.alts.map(a=>esc(a+'  '+sentence(q,a))).join(' / ')}</p>`:''}<p class="ex">${esc(q.ex)}</p>${ok?'':'<p class="sub">この問題をストックしました。</p>'}</div>
     <div class="acts"><button class="st${st.stock.includes(q.no)?' on':''}" id="stk">${lbl()}</button><button class="next" id="nx">${last?'結果を見る':'次の問題'}</button></div>`;
   $('#stk').onclick=e=>{
     st.stock=st.stock.includes(q.no)?st.stock.filter(n=>n!==q.no):[...st.stock,q.no];
