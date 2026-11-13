@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>整序問題</title>
+
+<!-- Google FontsからUD系フォント（BIZ UDPGothic）を読み込み -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
-:root{--bg:#f3f5f4;--card:#fff;--tx:#1c2523;--mut:#66726f;--bd:#d8dedc;--board:#1f3a34;--chalk:#f2f4ef;--hi:#e8c547;--ok:#23804f;--ng:#c0392b;--sel:#1f3a34;--selx:#f2f4ef}
+:root{
+    --bg:#f3f5f4;--card:#fff;--tx:#1c2523;--mut:#66726f;--bd:#d8dedc;--board:#1f3a34;--chalk:#f2f4ef;--hi:#e8c547;--ok:#23804f;--ng:#c0392b;--sel:#1f3a34;--selx:#f2f4ef;
+    --base-font: "UD Digi Kyokasho N-R", "UD Digital Kyokasho NK-R", "BIZ UDPGothic", "メイリオ", Meiryo, sans-serif;
+}
 @media(prefers-color-scheme:dark){:root{--bg:#121816;--card:#1a2220;--tx:#e6ebe9;--mut:#93a09c;--bd:#2c3835;--board:#0f1f1b;--chalk:#eef1ec;--ok:#46c07f;--ng:#ff7b6e;--sel:#e8c547;--selx:#14201d}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.7 "Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif}
+
+/* ページ全体および文字を扱う要素にUDフォントを確実に適用 */
+body, button, select, input, textarea, h1, h2, h3, h4, h5, h6 {
+    font-family: var(--base-font) !important;
+}
+
+body{margin:0;background:var(--bg);color:var(--tx);font-size:16px;line-height:1.7}
 header{background:var(--board);color:var(--chalk);padding:18px 16px 14px;border-bottom:5px solid var(--hi)}
 header h1{margin:0;font-size:26px;letter-spacing:.1em;font-weight:700}
 header p{margin:2px 0 0;font-size:13px;opacity:.8}
@@ -30,14 +45,14 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
 .prog i{display:block;height:100%;background:var(--hi)}
 .unit{font-size:12px;color:var(--mut);margin-bottom:6px}
 .jp{margin:0 0 8px}
-.en{font:20px/2.3 Georgia,"Times New Roman",serif;word-break:break-word}
+.en{font-size:20px;line-height:2.3;font-family:Georgia,"Times New Roman",serif;word-break:break-word}
 .sl{display:inline-block;min-width:3.4em;min-height:1.6em;padding:0 .35em;margin:0 .15em;border-bottom:2px solid var(--mut);text-align:center;line-height:1.6;vertical-align:baseline}
 .sl.f{border-color:var(--sel);font-weight:700}
 .sl.cur{border-color:var(--hi);background:color-mix(in srgb,var(--hi) 28%,transparent)}
 .sl.ok{border-color:var(--ok);color:var(--ok)}.sl.ng{border-color:var(--ng);color:var(--ng);text-decoration:line-through}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
-.chip{padding:8px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font:17px Georgia,serif}
-.chip b{color:var(--mut);font-family:system-ui;margin-right:.3em}
+.chip{padding:8px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font-size:17px;font-family:Georgia,serif}
+.chip b{color:var(--mut);font-family:var(--base-font);margin-right:.3em}
 .chip:disabled{opacity:.3;cursor:default}
 .ctl{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut)}
 .ctl button{padding:8px 14px;border:1.5px solid var(--bd);background:var(--card);border-radius:8px;cursor:pointer}
@@ -45,7 +60,7 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
 .fb{margin-top:14px;padding:12px 14px;border-radius:8px;border-left:6px solid var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
 .fb.bad{border-color:var(--ng);background:color-mix(in srgb,var(--ng) 10%,transparent)}
 .fb h3{margin:0 0 4px;font-size:18px}
-.ans{white-space:pre-wrap;font:18px/1.7 Georgia,serif;font-weight:700;margin:4px 0}
+.ans{white-space:pre-wrap;font-size:18px;line-height:1.7;font-family:Georgia,serif;font-weight:700;margin:4px 0}
 .ex{white-space:pre-wrap;margin:6px 0 0}
 .acts{display:flex;gap:8px;margin-top:12px}
 .acts button{flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--bd);background:var(--card);cursor:pointer}
@@ -84,7 +99,7 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
     &larr; ポータルに戻る
 </a>
 <script>
-const CSV_FILE='questions.csv';          // 問題を差し替えるときは、このCSVを入れ替える
+const CSV_FILE='questions.csv';         // 問題を差し替えるときは、このCSVを入れ替える
 const CIRC='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳', BLK='(     )';
 let ALL=[], S={scope:'unit',unit:'',n:10}, Q=null, LSK='seijo_v1', st={stock:[],rec:{}};
 const $=s=>document.querySelector(s), app=$('#app');
@@ -125,7 +140,7 @@ function setData(text){
     const alts=(o['別解']||'').split('|').map(x=>x.trim()).filter(Boolean);   // 別解の番号解答(複数は | 区切り)
     ALL.push({no,unit:(o['単元']||'').trim()||'その他',stem,items,note,nb,num,eng,alts,ans:o['解答']||'',ex:o['解説']||''});
   });
-  LSK=title=='中級整序問題'?'seijo_v1':'seijo_v1_'+title;   // アプリ名ごとに記録を分ける
+  LSK=title=='中級整序問題'?'seijo_v1':'seijo_v1_'+title;    // アプリ名ごとに記録を分ける
   st=loadSt();
   document.title=title;$('#ttl').textContent=title;$('#sub').textContent=first('サブタイトル');
   const us=units();if(!us.includes(S.unit))S.unit=us[0]||'';
@@ -196,7 +211,7 @@ function show(){
   app.innerHTML=`
   <div class="bar"><span>${Q.i+1} / ${total}問 ・ 正解 ${Q.ok}</span><button id="quit">ホームに戻る</button></div>
   <div class="prog"><i style="width:${Q.i/total*100}%"></i></div>
-  <div class="card"><div class="unit">${esc(q.unit)}　No.${q.no}</div>
+  <div class="card"><div class="unit">${esc(q.unit)} No.${q.no}</div>
   <div id="stem">${stemHtml(q)}</div>
   <div class="chips">${q.items.map((t,i)=>`<button class="chip" data-i="${i}" ${Q.picks.includes(i)||Q.done?'disabled':''}><b>${CIRC[i]}</b>${esc(t)}</button>`).join('')}</div>
   <div class="ctl"><span>${esc(q.note)}</span><button id="undo" ${Q.picks.length&&!Q.done?'':'disabled'}>↩ 戻る</button></div>
