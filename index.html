@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>整序問題</title>
+<style>
+:root{--bg:#f3f5f4;--card:#fff;--tx:#1c2523;--mut:#66726f;--bd:#d8dedc;--board:#1f3a34;--chalk:#f2f4ef;--hi:#e8c547;--ok:#23804f;--ng:#c0392b;--sel:#1f3a34;--selx:#f2f4ef}
+@media(prefers-color-scheme:dark){:root{--bg:#121816;--card:#1a2220;--tx:#e6ebe9;--mut:#93a09c;--bd:#2c3835;--board:#0f1f1b;--chalk:#eef1ec;--ok:#46c07f;--ng:#ff7b6e;--sel:#e8c547;--selx:#14201d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.7 "Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif}
+header{background:var(--board);color:var(--chalk);padding:18px 16px 14px;border-bottom:5px solid var(--hi)}
+header h1{margin:0;font-size:26px;letter-spacing:.1em;font-weight:700}
+header p{margin:2px 0 0;font-size:13px;opacity:.8}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}
+h2{font-size:15px;margin:0 0 10px;color:var(--mut);font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+button,select{font:inherit;color:inherit}
+.opt{flex:1 1 0;min-width:96px;padding:10px 8px;border:1.5px solid var(--bd);background:var(--card);border-radius:8px;cursor:pointer}
+.opt.on{background:var(--sel);color:var(--selx);border-color:var(--sel);font-weight:700}
+.opt small{display:block;font-size:12px;opacity:.75}
+select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card)}
+.go{width:100%;padding:14px;border:0;border-radius:10px;background:var(--board);color:var(--chalk);font-size:18px;font-weight:700;cursor:pointer;border-bottom:4px solid var(--hi)}
+.go:disabled{opacity:.4;cursor:not-allowed}
+.link{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;padding:6px 0}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-size:14px;color:var(--mut)}
+.bar button{padding:6px 12px;border:1.5px solid var(--bd);background:var(--card);border-radius:8px;cursor:pointer}
+.prog{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--hi)}
+.unit{font-size:12px;color:var(--mut);margin-bottom:6px}
+.jp{margin:0 0 8px}
+.en{font:20px/2.3 Georgia,"Times New Roman",serif;word-break:break-word}
+.sl{display:inline-block;min-width:3.4em;min-height:1.6em;padding:0 .35em;margin:0 .15em;border-bottom:2px solid var(--mut);text-align:center;line-height:1.6;vertical-align:baseline}
+.sl.f{border-color:var(--sel);font-weight:700}
+.sl.cur{border-color:var(--hi);background:color-mix(in srgb,var(--hi) 28%,transparent)}
+.sl.ok{border-color:var(--ok);color:var(--ok)}.sl.ng{border-color:var(--ng);color:var(--ng);text-decoration:line-through}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
+.chip{padding:8px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font:17px Georgia,serif}
+.chip b{color:var(--mut);font-family:system-ui;margin-right:.3em}
+.chip:disabled{opacity:.3;cursor:default}
+.ctl{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut)}
+.ctl button{padding:8px 14px;border:1.5px solid var(--bd);background:var(--card);border-radius:8px;cursor:pointer}
+.ctl button:disabled{opacity:.35;cursor:default}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;border-left:6px solid var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.fb.bad{border-color:var(--ng);background:color-mix(in srgb,var(--ng) 10%,transparent)}
+.fb h3{margin:0 0 4px;font-size:18px}
+.ans{white-space:pre-wrap;font:18px/1.7 Georgia,serif;font-weight:700;margin:4px 0}
+.ex{white-space:pre-wrap;margin:6px 0 0}
+.acts{display:flex;gap:8px;margin-top:12px}
+.acts button{flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--bd);background:var(--card);cursor:pointer}
+.acts .next{background:var(--board);color:var(--chalk);border-color:var(--board);font-weight:700}
+.acts .st.on{background:var(--hi);color:#2a2200;border-color:var(--hi);font-weight:700}
+.big{font-size:44px;font-weight:700;text-align:center;margin:6px 0}
+.rec{padding:12px 0;border-top:1px solid var(--bd)}.rec:first-child{border-top:0;padding-top:0}.rec h3{margin:0 0 6px;font-size:16px}
+.m{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0}.m span{width:4em;color:var(--mut)}.m .t{flex:1;height:10px;background:var(--bd);border-radius:5px;overflow:hidden}.m .t i{display:block;height:100%}.m b{width:3.4em;text-align:right}
+.sub{font-size:12px;color:var(--mut);margin:4px 0}
+.msg{padding:14px;border:1.5px dashed var(--ng);border-radius:8px}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><h1 id="ttl">整序問題</h1><p id="sub"></p></header>
+<main id="app"></main>
+<script>
+const CSV_FILE='questions.csv';          // 問題を差し替えるときは、このCSVを入れ替える
+const CIRC='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳', BLK='(     )';
+let ALL=[], S={scope:'unit',unit:'',n:10}, Q=null, LSK='seijo_v1', st={stock:[],rec:{}};
+const $=s=>document.querySelector(s), app=$('#app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const loadSt=()=>{try{return Object.assign({stock:[],rec:{}},JSON.parse(localStorage.getItem(LSK)))}catch(e){return{stock:[],rec:{}}}};
+const save=()=>{try{localStorage.setItem(LSK,JSON.stringify(st))}catch(e){}};
+const isJp=l=>/[\u3040-\u30ff\u4e00-\u9fff]/.test(l)&&!l.includes(BLK);
+const flat=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,'');const rows=[];let r=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c=='"')q=true;
+    else if(c==','){r.push(f);f=''}
+    else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;r.push(f);f='';if(r.length>1||r[0]!=='')rows.push(r);r=[]}
+    else f+=c}
+  if(f!==''||r.length){r.push(f);rows.push(r)}
+  const h=rows.shift().map(x=>x.trim());
+  return rows.map(x=>{const o={};h.forEach((k,i)=>o[k]=x[i]??'');return o});
+}
+function setData(text){
+  const rows=parseCSV(text).filter(o=>(o['問題']||'').trim());
+  const first=k=>{const r=rows.find(o=>(o[k]||'').trim());return r?r[k].trim():''};
+  const title=first('アプリ名')||'整序問題';
+  ALL=[];const used=new Set();
+  rows.forEach((o,i)=>{
+    let no=parseInt(o['No'],10);if(!isFinite(no)||used.has(no))no=100000+i;used.add(no);
+    const lines=o['問題'].replace(/\r\n?/g,'\n').split('\n');
+    let gi=-1;lines.forEach((l,k)=>{if(l.includes('①'))gi=k});
+    if(gi<0)return;
+    const g=lines[gi], nm=g.match(/〈[^〉]*〉|※\S*/), note=nm?nm[0]:'';
+    const items=g.replace(note,'').split(/[①-⑳]/).slice(1).map(x=>x.trim()).filter(Boolean);
+    const stem=lines.slice(0,gi), nb=stem.join('\n').split(BLK).length-1;
+    const al=(o['解答']||'').replace(/\r\n?/g,'\n').split('\n');
+    const num=(o['番号解答']||al[0]||'').trim(), eng=al.slice(1).join(' ');
+    ALL.push({no,unit:(o['単元']||'').trim()||'その他',stem,items,note,nb,num,eng,ans:o['解答']||'',ex:o['解説']||''});
+  });
+  LSK=title=='中級整序問題'?'seijo_v1':'seijo_v1_'+title;   // アプリ名ごとに記録を分ける
+  st=loadSt();
+  document.title=title;$('#ttl').textContent=title;$('#sub').textContent=first('サブタイトル');
+  const us=units();if(!us.includes(S.unit))S.unit=us[0]||'';
+  home();
+}
+const units=()=>[...new Set(ALL.map(q=>q.unit))];
+function init(){
+  fetch(CSV_FILE,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.text()}).then(setData).catch(()=>{
+    app.innerHTML=`<div class="msg"><b>${esc(CSV_FILE)} を読み込めませんでした。</b><p>index.html と同じフォルダにCSVを置き、GitHub Pagesなどのサーバー経由で開いてください。ファイルを直接開いている場合は、下のボタンからCSVを選べます。</p><input type="file" id="f" accept=".csv"></div>`;
+    $('#f').onchange=e=>{const fr=new FileReader();fr.onload=()=>setData(fr.result);fr.readAsText(e.target.files[0],'utf-8')};
+  });
+}
+
+/* 判定(純粋関数) */
+function check(q,picks){
+  const seq=picks.map(i=>CIRC[i]).join('');
+  let k=0;const text=q.stem.filter(l=>!isJp(l)).join(' ').replace(/\(     \)/g,()=>q.items[picks[k++]]||'');
+  return{seq,ok:seq===q.num||flat(text)===flat(q.eng)};
+}
+
+/* ---------- ホーム ---------- */
+function pool(){
+  if(S.scope=='unit')return ALL.filter(q=>q.unit==S.unit);
+  if(S.scope=='stock')return ALL.filter(q=>st.stock.includes(q.no));
+  return ALL;
+}
+function home(){
+  Q=null;
+  const p=pool(), cnt=S.scope=='random'?Math.min(S.n,p.length):p.length;
+  const o=(on,attr,main,sub)=>`<button class="opt${on?' on':''}" ${attr}>${main}${sub?`<small>${sub}</small>`:''}</button>`;
+  app.innerHTML=`
+  <div class="card"><h2>出題範囲</h2><div class="row">
+    ${o(S.scope=='unit','data-scope="unit"','単元別')}${o(S.scope=='random','data-scope="random"','ランダム')}
+    ${o(S.scope=='stock','data-scope="stock"','ストック問題',st.stock.length+'問')}
+  </div></div>
+  ${S.scope=='unit'?`<div class="card"><h2>単元(選んだ単元の全問題に挑戦します)</h2><select id="unit">${units().map(u=>`<option${u==S.unit?' selected':''}>${esc(u)}</option>`).join('')}</select></div>`:''}
+  ${S.scope=='random'?`<div class="card"><h2>問題数</h2><div class="row">${[10,20,50].map(n=>o(S.n==n,`data-n="${n}"`,n+'問')).join('')}</div></div>`:''}
+  <button class="go" id="start" ${cnt?'':'disabled'}>${cnt?`演習スタート(${cnt}問)`:(S.scope=='stock'?'ストック問題はまだありません':'問題がありません')}</button>
+  <p style="text-align:center"><button class="link" id="rec">あなたの記録</button></p>`;
+  app.querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>{S.scope=b.dataset.scope;home()});
+  app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{S.n=+b.dataset.n;home()});
+  const u=$('#unit');if(u)u.onchange=()=>{S.unit=u.value;home()};
+  $('#start').onclick=start;$('#rec').onclick=recView;
+}
+
+/* ---------- 演習 ---------- */
+function start(){
+  let p=pool();if(S.scope=='random')p=shuffle(p).slice(0,S.n);
+  if(!p.length)return;
+  Q={list:p,i:0,ok:0,picks:[],done:false,res:null};show();
+}
+function quit(){if(confirm('演習をやめてホームに戻りますか?\n(ここまでの正誤は保存されます)'))home()}
+function stemHtml(q){
+  let k=0;const ansIdx=[...q.num].map(c=>CIRC.indexOf(c));
+  return q.stem.map(l=>{
+    const parts=l.split(BLK);let h=esc(parts[0]);
+    for(let i=1;i<parts.length;i++,k++){
+      const pk=Q.picks[k];let cls='sl';
+      if(pk!==undefined){cls+=Q.done?(pk===ansIdx[k]?' ok':' ng'):' f'}else if(k===Q.picks.length&&!Q.done)cls+=' cur';
+      h+=`<span class="${cls}">${pk!==undefined?esc(q.items[pk]):'&nbsp;'}</span>`+esc(parts[i]);
+    }
+    return `<div class="${isJp(l)?'jp':'en'}">${h}</div>`;
+  }).join('');
+}
+function show(){
+  const q=Q.list[Q.i], total=Q.list.length;
+  app.innerHTML=`
+  <div class="bar"><span>${Q.i+1} / ${total}問 ・ 正解 ${Q.ok}</span><button id="quit">ホームに戻る</button></div>
+  <div class="prog"><i style="width:${Q.i/total*100}%"></i></div>
+  <div class="card"><div class="unit">${esc(q.unit)}　No.${q.no}</div>
+  <div id="stem">${stemHtml(q)}</div>
+  <div class="chips">${q.items.map((t,i)=>`<button class="chip" data-i="${i}" ${Q.picks.includes(i)||Q.done?'disabled':''}><b>${CIRC[i]}</b>${esc(t)}</button>`).join('')}</div>
+  <div class="ctl"><span>${esc(q.note)}</span><button id="undo" ${Q.picks.length&&!Q.done?'':'disabled'}>↩ 戻る</button></div>
+  <div id="fb"></div></div>`;
+  $('#quit').onclick=quit;$('#undo').onclick=undo;
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>pick(+b.dataset.i));
+  if(Q.done)feedback();
+}
+function pick(i){
+  const q=Q.list[Q.i];if(Q.done||Q.picks.includes(i)||Q.picks.length>=q.nb)return;
+  Q.picks.push(i);
+  if(Q.picks.length==q.nb)judge();else show();
+}
+function undo(){if(!Q||Q.done||!Q.picks.length)return;Q.picks.pop();show()}
+function judge(){
+  const q=Q.list[Q.i], r=check(q,Q.picks);
+  Q.done=true;Q.res=r.ok;
+  st.rec[q.no]=r.ok?'c':'x';
+  if(r.ok)Q.ok++;else if(!st.stock.includes(q.no))st.stock.push(q.no);
+  save();show();
+}
+function feedback(){
+  const q=Q.list[Q.i], ok=Q.res, last=Q.i==Q.list.length-1;
+  const lbl=()=>st.stock.includes(q.no)?'★ ストック済み(タップで外す)':'☆ 自信がない:ストックに追加';
+  $('#fb').innerHTML=`<div class="fb${ok?'':' bad'}"><h3>${ok?'◯ 正解':'✕ 不正解'}</h3>
+    <div class="ans">${esc(q.ans)}</div><p class="ex">${esc(q.ex)}</p>${ok?'':'<p class="sub">この問題をストックしました。</p>'}</div>
+    <div class="acts"><button class="st${st.stock.includes(q.no)?' on':''}" id="stk">${lbl()}</button><button class="next" id="nx">${last?'結果を見る':'次の問題'}</button></div>`;
+  $('#stk').onclick=e=>{
+    st.stock=st.stock.includes(q.no)?st.stock.filter(n=>n!==q.no):[...st.stock,q.no];
+    if(ok)st.rec[q.no]=st.stock.includes(q.no)?'u':'c';   // 正解でも自信がなければ正答に数えない
+    save();e.target.classList.toggle('on',st.stock.includes(q.no));e.target.textContent=lbl();
+  };
+  $('#nx').onclick=next;
+}
+function next(){if(Q.i<Q.list.length-1){Q.i++;Q.picks=[];Q.done=false;show();scrollTo(0,0)}else result()}
+function result(){
+  const t=Q.list.length;
+  app.innerHTML=`<div class="card"><h2>結果</h2><div class="big">${Q.ok} / ${t}</div><p style="text-align:center;margin:0">正答率 ${Math.round(Q.ok/t*100)}%</p>
+  <p class="sub" style="text-align:center">ストック中の問題:${st.stock.length}問</p></div><button class="go" id="h">ホームに戻る</button>`;
+  $('#h').onclick=home;scrollTo(0,0);
+}
+document.addEventListener('keydown',e=>{
+  if(!Q||e.metaKey||e.ctrlKey||e.isComposing)return;
+  if(Q.done&&e.key=='Enter'){const n=$('#nx');if(n){e.preventDefault();n.click()}}
+  else if(!Q.done&&e.key=='Backspace'){e.preventDefault();undo()}
+  else if(!Q.done&&/^[1-9]$/.test(e.key))pick(+e.key-1);
+});
+
+/* ---------- あなたの記録 ---------- */
+function recView(){
+  Q=null;
+  const ss=units().map(u=>{const qs=ALL.filter(q=>q.unit==u);return{u,total:qs.length,tried:qs.filter(q=>st.rec[q.no]).length,ok:qs.filter(q=>st.rec[q.no]=='c').length}});
+  const sum=ss.reduce((a,x)=>({total:a.total+x.total,tried:a.tried+x.tried,ok:a.ok+x.ok}),{total:0,tried:0,ok:0});
+  const pct=(a,b)=>b?Math.round(a/b*100):null;
+  const meter=(l,v,c)=>`<div class="m"><span>${l}</span><div class="t"><i style="width:${v||0}%;background:${c}"></i></div><b>${v==null?'—':v+'%'}</b></div>`;
+  const blk=(name,x)=>`<div class="rec"><h3>${esc(name)}</h3>${meter('達成率',pct(x.ok,x.total),'var(--hi)')}${meter('正答率',pct(x.ok,x.tried),'var(--ok)')}<div class="sub">正答 ${x.ok}問 / 全${x.total}問 ・ 演習済み ${x.tried}問</div></div>`;
+  app.innerHTML=`<div class="bar"><span>あなたの記録</span><button id="b">ホームに戻る</button></div>
+  <div class="card">${blk('全体',sum)}</div>
+  <div class="card"><h2>単元ごとの記録</h2>${ss.map(x=>blk(x.u,x)).join('')}</div>
+  <div class="card"><h2>達成率・正答率とは</h2>
+    <p class="sub"><b>達成率</b>=単元の全問題のうち、正答した問題の割合</p>
+    <p class="sub"><b>正答率</b>=演習した問題のうち、正答した問題の割合</p>
+    <p class="sub">各問題の「最新の解答」で数えます(間違えた問題を後で正解すれば正答になります)。正解でも「自信がない」としてストックした問題は、正答に数えません。ストック問題に正解すると正答扱いになります。</p></div>
+  <p style="text-align:center"><button class="link" id="reset">記録をリセットする</button></p>`;
+  $('#b').onclick=home;
+  $('#reset').onclick=()=>{if(confirm('達成率・正答率の記録をリセットします(ストックは残ります)。よろしいですか?')){st.rec={};save();recView()}};
+  scrollTo(0,0);
+}
+init();
+</script>
+</body>
+</html>
