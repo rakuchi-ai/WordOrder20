@@ -57,11 +57,32 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
 .sub{font-size:12px;color:var(--mut);margin:4px 0}
 .msg{padding:14px;border:1.5px dashed var(--ng);border-radius:8px}
 :focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+    .back-portal-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .back-portal-link:hover {
+        background-color: #e2e8f0;
+        color: #1e293b;
+    }
 </style>
 </head>
 <body>
 <header><h1 id="ttl">整序問題</h1><p id="sub"></p></header>
 <main id="app"></main>
+  <a href="https://rakuchi-ai.github.io/ENGLISH-TOP/" class="back-portal-link">
+    &larr; ポータルに戻る
+</a>
 <script>
 const CSV_FILE='questions.csv';          // 問題を差し替えるときは、このCSVを入れ替える
 const CIRC='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳', BLK='(     )';
