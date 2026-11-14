@@ -45,13 +45,15 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
 .prog i{display:block;height:100%;background:var(--hi)}
 .unit{font-size:12px;color:var(--mut);margin-bottom:6px}
 .jp{margin:0 0 8px}
-.en{font-size:20px;line-height:2.3;font-family:Georgia,"Times New Roman",serif;word-break:break-word}
+
+/* 問題文やチップ、解答にもUDフォントを優先適用 */
+.en{font-size:20px;line-height:2.3;font-family:var(--base-font), Georgia,"Times New Roman",serif;word-break:break-word}
 .sl{display:inline-block;min-width:3.4em;min-height:1.6em;padding:0 .35em;margin:0 .15em;border-bottom:2px solid var(--mut);text-align:center;line-height:1.6;vertical-align:baseline}
 .sl.f{border-color:var(--sel);font-weight:700}
 .sl.cur{border-color:var(--hi);background:color-mix(in srgb,var(--hi) 28%,transparent)}
 .sl.ok{border-color:var(--ok);color:var(--ok)}.sl.ng{border-color:var(--ng);color:var(--ng);text-decoration:line-through}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
-.chip{padding:8px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font-size:17px;font-family:Georgia,serif}
+.chip{padding:8px 12px;border:1.5px solid var(--bd);border-radius:8px;background:var(--card);cursor:pointer;font-size:17px;font-family:var(--base-font), Georgia,serif}
 .chip b{color:var(--mut);font-family:var(--base-font);margin-right:.3em}
 .chip:disabled{opacity:.3;cursor:default}
 .ctl{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut)}
@@ -60,7 +62,7 @@ select{width:100%;padding:10px;border:1.5px solid var(--bd);border-radius:8px;ba
 .fb{margin-top:14px;padding:12px 14px;border-radius:8px;border-left:6px solid var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
 .fb.bad{border-color:var(--ng);background:color-mix(in srgb,var(--ng) 10%,transparent)}
 .fb h3{margin:0 0 4px;font-size:18px}
-.ans{white-space:pre-wrap;font-size:18px;line-height:1.7;font-family:Georgia,serif;font-weight:700;margin:4px 0}
+.ans{white-space:pre-wrap;font-size:18px;line-height:1.7;font-family:var(--base-font), Georgia,serif;font-weight:700;margin:4px 0}
 .ex{white-space:pre-wrap;margin:6px 0 0}
 .acts{display:flex;gap:8px;margin-top:12px}
 .acts button{flex:1;padding:12px;border-radius:8px;border:1.5px solid var(--bd);background:var(--card);cursor:pointer}
@@ -241,7 +243,7 @@ function feedback(){
     <div class="acts"><button class="st${st.stock.includes(q.no)?' on':''}" id="stk">${lbl()}</button><button class="next" id="nx">${last?'結果を見る':'次の問題'}</button></div>`;
   $('#stk').onclick=e=>{
     st.stock=st.stock.includes(q.no)?st.stock.filter(n=>n!==q.no):[...st.stock,q.no];
-    if(ok)st.rec[q.no]=st.stock.includes(q.no)?'u':'c';   // 正解でも自信がなければ正答に数えない
+    if(ok)st.rec[q.no]=st.stock.includes(q.no)?'u':'c';    // 正解でも自信がなければ正答に数えない
     save();e.target.classList.toggle('on',st.stock.includes(q.no));e.target.textContent=lbl();
   };
   $('#nx').onclick=next;
